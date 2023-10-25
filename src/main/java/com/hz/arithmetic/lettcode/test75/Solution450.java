@@ -10,28 +10,75 @@ package com.hz.arithmetic.lettcode.test75;
 public class Solution450 {
 
   public TreeNode deleteNode(TreeNode root, int key) {
-    TreeNode delRoot = root;
-    boolean flag = true;
-    while (delRoot != null) {
-      if (delRoot.val == key) {
-        flag = false;
-        break;
-      } else if (delRoot.val < key) {
-        delRoot = delRoot.right;
+    if (root == null) {
+      return null;
+    }
+    if (root.val > key) {
+      root.left = deleteNode(root.left, key);
+    } else if (root.val < key) {
+      root.right = deleteNode(root.right, key);
+    } else {
+      if (root.left == null && root.right == null) {
+        return null;
+      } else if (root.right == null) {
+        return root.left;
+      } else if (root.left == null) {
+        return root.right;
+      }
+      TreeNode successor = root.right;
+      while (successor.left != null) {
+        successor = successor.left;
+      }
+      successor.left = root.left;
+      return root.right;
+    }
+    return root;
+  }
+
+  /**
+   * 迭代
+   *
+   * @param root
+   * @param key
+   * @return
+   */
+  public TreeNode deleteNode2(TreeNode root, int key) {
+    TreeNode parent = null, curr = root;
+    while (curr != null && curr.val != key) {
+      parent = curr;
+      if (key > curr.val) {
+        curr = curr.right;
       } else {
-        delRoot = delRoot.left;
+        curr = curr.left;
       }
     }
-    if (flag) {
+    if (curr == null) {
       return root;
     }
-    if (delRoot.left == null && delRoot.right == null) {
-      // 删除这节点，直接删除
-
-      return root;
+    if (curr.left == null && curr.right == null) {
+      curr = null;
+    } else if (curr.left == null) {
+      curr = curr.right;
+    } else if (curr.right == null) {
+      curr = curr.left;
     } else {
-      // 需要把子树合并成一个
-      return null;
+      TreeNode successorP = curr, successor = curr.right;
+      while (successor.left != null) {
+        successorP = successor;
+        successor = successor.left;
+      }
+      successor.left = curr.left;
+      curr = curr.right;
+    }
+    if (parent == null) {
+      return curr;
+    } else {
+      if (parent.left != null && parent.left.val == key) {
+        parent.left = curr;
+      } else {
+        parent.right = curr;
+      }
+      return root;
     }
   }
 
