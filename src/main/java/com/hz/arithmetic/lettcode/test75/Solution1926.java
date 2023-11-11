@@ -1,5 +1,8 @@
 package com.hz.arithmetic.lettcode.test75;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 /**
  * 迷宫中离入口最近的出口
  *
@@ -8,37 +11,30 @@ package com.hz.arithmetic.lettcode.test75;
  */
 public class Solution1926 {
 
-  public int nearestExit(char[][] maze, int[] entrance) {
-    int m = maze.length, n = maze[0].length, i = entrance[0], j = entrance[1];
-    int[] result = new int[]{Integer.MAX_VALUE};
-    nearestExit(maze, i, j, 0, result);
-    return result[0] == Integer.MAX_VALUE ? -1 : result[0];
+  public static void main(String[] args) {
+    char[][] maze = new char[][]{{'+', '+', '.', '+'}, {'.', '.', '.', '+'}, {'+', '+', '+', '.'}};
+    int[] entrance = new int[]{1, 2};
+    nearestExit(maze, entrance);
   }
 
-  private void nearestExit(char[][] maze, int i, int j, int d, int[] result) {
+  public static int nearestExit(char[][] maze, int[] entrance) {
+    Queue<int[]> queue = new ArrayDeque<>();
     int m = maze.length, n = maze[0].length;
-    if (i < 0 || i >= m || j < 0 || j >= n) {
-      return;
-    } else if (i == 0 || i == m - 1 || j == 0 || j == n - 1) {
-      if (d != 0 && d < result[0]) {
-        result[0] = d;
+    int[][] tmp = new int[][]{{0, -1}, {1, 0}, {0, 1}, {-1, 0}};
+    queue.offer(new int[]{entrance[0], entrance[1], 0});
+    while (!queue.isEmpty()) {
+      int[] poll = queue.poll();
+      if ((poll[0] == 0 || poll[0] == m - 1 || poll[1] == 0 || poll[1] == n - 1) && poll[2] > 0) {
+        return poll[2];
+      } else {
+        for (int[] ints : tmp) {
+          int x = poll[0] + ints[0], y = poll[1] + ints[1], t = poll[2] + 1;
+          if (x >= 0 && x < m && y >= 0 && y < n && maze[x][y] == '.') {
+            queue.offer(new int[]{x, y, t});
+          }
+        }
       }
     }
-    if (i - 1 <= 0 && maze[i - 1][j] == '.') {
-      maze[i - 1][j] = '0';
-      nearestExit(maze, i - 1, j, d + 1, result);
-    }
-    if (j + 1 < n && maze[i][j + 1] == '.') {
-      maze[i][j + 1] = '0';
-      nearestExit(maze, i, j + 1, d + 1, result);
-    }
-    if (i + 1 < m && maze[i + 1][j] == '.') {
-      maze[i + 1][j] = '0';
-      nearestExit(maze, i + 1, j, d + 1, result);
-    }
-    if (j - 1 >= 0 && maze[i][j - 1] == '.') {
-      maze[i][j - 1] = '0';
-      nearestExit(maze, i, j - 1, d + 1, result);
-    }
+    return -1;
   }
 }
